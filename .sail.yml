@@ -5,6 +5,17 @@ tasks:
       - "mkdir /workspace/docker && echo $DOCKER_AUTH | base64 -d > /workspace/docker/config.json"
     env:
       - DOCKER_AUTH
+  build-push-run:
+    image: gcr.io/kaniko-project/executor
+    args:
+      - --dockerfile
+      - ./run/Dockerfile
+      - --context
+      - $(GIT_CLONE_DIR)/run
+      - --destination
+      - index.docker.io/sailci/run:$(GIT_SHORT_SHA)
+    env:
+      - DOCKER_CONFIG: /workspace/docker
   build-push-clone-github:
     image: gcr.io/kaniko-project/executor
     args:
