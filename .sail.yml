@@ -1,0 +1,18 @@
+tasks:
+  docker-auth:
+    image: sailci/run
+    args:
+      - "mkdir /workspace/docker && echo $DOCKER_AUTH | base64 -d > /workspace/docker/config.json"
+    env:
+      - DOCKER_AUTH
+  build-push-clone-github:
+    image: gcr.io/kaniko-project/executor
+    args:
+      - --dockerfile
+      - ./clone-github/Dockerfile
+      - --context
+      - $(GIT_CLONE_DIR)/clone-github
+      - --destination
+      - index.docker.io/sailci/clone-github:$(GIT_SHORT_SHA)
+    env:
+      - DOCKER_CONFIG: /workspace/docker

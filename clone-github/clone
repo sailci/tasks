@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -e
+
+IS_PR=false
+GIT_BRANCH=master
+
+case "$GIT_REF" in
+  refs/pull/*) IS_PR=true ;; 
+  # Get branch name after refs/heads/ or refs/tags/
+  refs/heads/*) GIT_BRANCH=${GIT_REF#refs/heads/} ;;
+  refs/tags/*) GIT_BRANCH=${GIT_REF#refs/tags/} ;;
+esac
+
+{
+  git clone -b "$GIT_BRANCH" --single-branch https://x-access-token:"$GIT_TOKEN"@github.com/"$GIT_OWNER"/"$GIT_REPO".git repo 2>/dev/null
+} || {
+  echo "Avast, we could not clone the $GIT_BRANCH branch for GitHub repository $GIT_OWNER/$GIT_REPO."
+  exit 1;
+}
+
+cd ./repo
+
+{
+  case "$GIT_REF" in
+    refs/pull/*) git fetch origin "$GIT_REF"/head 2>/dev/null ;;
+  esac
+} || {
+  echo "Avast, we could not fetch the pull request $GIT_REF for GitHub repository $GIT_OWNER/$GIT_REPO."
+  exit 1;
+}
+
+if [ -n "$GIT_SHA" ]; then
+  git checkout "$GIT_SHA"
+elif "$IS_PR"; then
+  git checkout FETCH_HEAD
+fi
