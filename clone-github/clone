@@ -2,36 +2,33 @@
 
 set -e
 
-IS_PR=false
-GIT_BRANCH=master
+CLONE_BRANCH=$SAIL_COMMIT_BRANCH
 
-case "$GIT_REF" in
-  refs/pull/*) IS_PR=true ;; 
-  # Get branch name after refs/heads/ or refs/tags/
-  refs/heads/*) GIT_BRANCH=${GIT_REF#refs/heads/} ;;
-  refs/tags/*) GIT_BRANCH=${GIT_REF#refs/tags/} ;;
+# If setting up a PR then just get master since we'll be fetching origin anyway
+case "$SAIL_COMMIT_REF" in
+  refs/pull/*)
+    CLONE_BRANCH=master ;;
 esac
 
 {
-  git clone -b "$GIT_BRANCH" --single-branch https://x-access-token:"$GIT_TOKEN"@github.com/"$GIT_OWNER"/"$GIT_REPO".git repo 2>/dev/null
+  git clone -b "$CLONE_BRANCH" --single-branch https://x-access-token:"$SAIL_GIT_TOKEN"@github.com/"$SAIL_REPO_OWNER"/"$SAIL_REPO_NAME".git repo 2>/dev/null
 } || {
-  echo "Avast, we could not clone the $GIT_BRANCH branch for GitHub repository $GIT_OWNER/$GIT_REPO."
+  echo "Avast, we could not clone the $CLONE_BRANCH branch for GitHub repository $SAIL_REPO_OWNER/$SAIL_REPO_NAME."
   exit 1;
 }
 
 cd ./repo
 
 {
-  case "$GIT_REF" in
-    refs/pull/*) git fetch origin "$GIT_REF"/head 2>/dev/null ;;
+  case "$SAIL_COMMIT_REF" in
+    refs/pull/*) git fetch --force origin "$SAIL_COMMIT_BRANCH/head:refs/$SAIL_COMMIT_BRANCH" 2>/dev/null
+    git checkout "$SAIL_COMMIT_BRANCH" ;;
   esac
 } || {
-  echo "Avast, we could not fetch the pull request $GIT_REF for GitHub repository $GIT_OWNER/$GIT_REPO."
+  echo "Avast, we could not fetch the pull request $SAIL_COMMIT_BRANCH for GitHub repository $SAIL_REPO_OWNER/$SAIL_REPO_NAME."
   exit 1;
 }
 
-if [ -n "$GIT_SHA" ]; then
-  git checkout "$GIT_SHA"
-elif "$IS_PR"; then
-  git checkout FETCH_HEAD
+if [ -n "$SAIL_COMMIT_SHA" ]; then
+  git checkout "$SAIL_COMMIT_SHA"
 fi
