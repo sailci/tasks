@@ -10,6 +10,7 @@ tasks:
       - index.docker.io/sailci/run:$(GIT_SHORT_SHA)
     mounts:
       - /root/.docker/config.json: DOCKER_AUTH
+    when: \/heads\/master$
   build-push-clone-github:
     image: gcr.io/kaniko-project/executor
     args:
@@ -21,3 +22,4 @@ tasks:
       - index.docker.io/sailci/clone-github:$(GIT_SHORT_SHA)
     mounts:
       - /root/.docker/config.json: DOCKER_AUTH
+    when: \/heads\/master$
