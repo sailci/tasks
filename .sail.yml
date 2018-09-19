@@ -5,9 +5,9 @@ tasks:
       - --dockerfile
       - ./run/Dockerfile
       - --context
-      - $(GIT_CLONE_DIR)/run
+      - $(SAIL_CLONE_DIR)/run
       - --destination
-      - index.docker.io/sailci/run:$(GIT_SHORT_SHA)
+      - index.docker.io/sailci/run:$(SAIL_COMMIT_SHORT_SHA)
     mounts:
       - /root/.docker/config.json: DOCKER_AUTH
     when: \/heads\/master$
@@ -17,9 +17,9 @@ tasks:
       - --dockerfile
       - ./clone-github/Dockerfile
       - --context
-      - $(GIT_CLONE_DIR)/clone-github
+      - $(SAIL_CLONE_DIR)/clone-github
       - --destination
-      - index.docker.io/sailci/clone-github:$(GIT_SHORT_SHA)
+      - index.docker.io/sailci/clone-github:$(SAIL_COMMIT_SHORT_SHA)
     mounts:
       - /root/.docker/config.json: DOCKER_AUTH
     when: \/heads\/master$
