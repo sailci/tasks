@@ -9,9 +9,7 @@ tasks:
       - --destination
       - index.docker.io/sailci/run:$(GIT_SHORT_SHA)
     mounts:
-      - /workspace/docker/config.json: DOCKER_AUTH
-    env:
-      - DOCKER_CONFIG: /workspace/docker
+      - /root/.docker/config.json: DOCKER_AUTH
   build-push-clone-github:
     image: gcr.io/kaniko-project/executor
     args:
@@ -22,6 +20,4 @@ tasks:
       - --destination
       - index.docker.io/sailci/clone-github:$(GIT_SHORT_SHA)
     mounts:
-      - /workspace/docker/config.json: DOCKER_AUTH
-    env:
-      - DOCKER_CONFIG: /workspace/docker
+      - /root/.docker/config.json: DOCKER_AUTH
