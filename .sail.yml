@@ -23,3 +23,15 @@ tasks:
     mounts:
       - /root/.docker/config.json: DOCKER_AUTH
     when: \/heads\/master$
+  build-push-anchore-engine:
+    image: gcr.io/kaniko-project/executor
+    args:
+      - --dockerfile
+      - ./anchore-engine/Dockerfile
+      - --context
+      - $(SAIL_CLONE_DIR)/anchore-engine
+      - --destination
+      - index.docker.io/sailci/anchore-engine:v0.3.0
+    mounts:
+      - /root/.docker/config.json: DOCKER_AUTH
+    when: \/heads\/master$
