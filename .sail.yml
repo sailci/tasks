@@ -23,3 +23,15 @@ tasks:
     mounts:
       - /root/.docker/config.json: DOCKER_AUTH
     when: \/heads\/master$
+  build-push-zeit-now:
+    image: gcr.io/kaniko-project/executor
+    args:
+      - --dockerfile
+      - ./zeit-now/Dockerfile
+      - --context
+      - $(SAIL_CLONE_DIR)/zeit-now
+      - --destination
+      - index.docker.io/sailci/zeit-now:$(SAIL_COMMIT_SHORT_SHA)
+    mounts:
+      - /root/.docker/config.json: DOCKER_AUTH
+    when: \/heads\/master$
